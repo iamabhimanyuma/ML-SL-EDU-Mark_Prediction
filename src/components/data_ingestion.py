@@ -5,7 +5,8 @@ from src.logger import logging
 from src.exception import CustomException
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
-
+from src.components.data_transformation import DataTransformConfig
+from src.components.model_trainer import model_trainer
 
 @dataclass
 class DataPathConfig:
@@ -30,6 +31,11 @@ class DataIngestionConfig:
             logging.info('Train data created successfully')
             test.to_csv(self.IngestionConfig.test_data_path, header=True, index=False)
             logging.info('Test data created successfully')
+
+            return {
+                self.IngestionConfig.train_data_path,
+                self.IngestionConfig.test_data_path
+            }
             
         except Exception as e:
             raise CustomException(e,sys)
@@ -37,4 +43,10 @@ class DataIngestionConfig:
 
 if __name__=='__main__':
     ing_obj=DataIngestionConfig()
-    ing_obj.DataIngestionInit()
+    train_path,test_path=ing_obj.DataIngestionInit()
+    trans_obj=DataTransformConfig()
+    train_array,test_array,_=trans_obj.DataTransformInitiation(train_path,test_path)
+    trainer_obj=model_trainer()
+    print(trainer_obj.model_trainer_object(train_array,test_array))
+
+    
